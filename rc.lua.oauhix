@@ -709,7 +709,7 @@ end
 -- }}}
 
 -- Restart Xcompmgr which awesome reload
-awful.util.spawn_with_shell("killall xcompmgr && xcompmgr -cCfF")
+awful.util.spawn_with_shell("killall xcompmgr ; xcompmgr -cCfFS")
 
 -- Autostart Applications
 run_once("fcitx")
