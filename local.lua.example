@@ -1,0 +1,12 @@
+local awful = require("awful")
+
+-- 添加开机启动项
+run_once("synergys")
+
+-- 添加全局快捷键
+root.keys(awful.util.table.join(globalkeys,
+    awful.key({ modkey }, "d", function () awful.util.spawn("gnome-commander") end),
+    awful.key({ modkey, "Control" }, "a", function () awful.util.spawn_with_shell("emulator -noaudio @avd0") end)
+))
+
+-- vim:ft=lua
