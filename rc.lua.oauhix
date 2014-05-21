@@ -530,13 +530,6 @@ globalkeys = awful.util.table.join(
     -- Copy to clipboard
     awful.key({ modkey }, "c", function () os.execute("xsel -p -o | xsel -i -b") end),
 
-    -- User programs
-    awful.key({ "Control" }, "F11", function () awful.util.spawn("pavucontrol") end),
-    awful.key({ "Control" }, "F12", function () awful.util.spawn("sh -c 'sleep 1 && xset dpms force off'") end),
-    awful.key({ "Control" }, "Escape", function () awful.util.spawn("xfce4-terminal --drop-down") end),
-    awful.key({ modkey }, "s", function () awful.util.spawn("firefox") end),
-    awful.key({ modkey }, "e", function () awful.util.spawn("nautilus") end),
-
     -- Prompt
     awful.key({ modkey }, "r", function () mypromptbox[mouse.screen]:run() end),
     awful.key({ modkey }, "x",
@@ -613,8 +606,6 @@ clientbuttons = awful.util.table.join(
     awful.button({ modkey }, 1, awful.mouse.client.move),
     awful.button({ modkey }, 3, awful.mouse.client.resize))
 
--- Set keys
-root.keys(globalkeys)
 -- }}}
 
 -- {{{ Rules
@@ -708,6 +699,19 @@ for s = 1, screen.count() do screen[s]:connect_signal("arrange", function ()
 end
 -- }}}
 
+-- {{{ Hotkey setting
+globalkeys = awful.util.table.join(globalkeys,
+    awful.key({ "Control" }, "F11", function () awful.util.spawn("pavucontrol") end),
+    awful.key({ "Control" }, "F12", function () awful.util.spawn_with_shell("sleep 1 && xset dpms force off") end),
+    awful.key({ "Control" }, "Escape", function () awful.util.spawn("xfce4-terminal --drop-down") end),
+    awful.key({ modkey }, "s", function () awful.util.spawn("firefox") end),
+    awful.key({ modkey }, "e", function () awful.util.spawn("xfce4-terminal -e vifm") end)
+)
+root.keys(globalkeys)
+---}}}
+
+-- {{{ Autostart setting
+
 -- Restart Xcompmgr which awesome reload
 awful.util.spawn_with_shell("killall xcompmgr ; xcompmgr -cCfFS")
 
@@ -716,6 +720,7 @@ run_once("fcitx")
 run_once("fcitx-qimpanel")
 run_once("goldendict")
 run_once("~/.nutstore/bin/nutstore-pydaemon.py")
+---}}}
 
 -- Include local file
 local file = io.open(".config/awesome/local.lua")
