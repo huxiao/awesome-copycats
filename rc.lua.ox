@@ -13,9 +13,17 @@ require("awful.autofocus")
 local wibox     = require("wibox")
 local beautiful = require("beautiful")
 local naughty   = require("naughty")
-local drop      = require("scratchdrop")
+--local drop      = require("scratchdrop")
 local lain      = require("lain")
 -- }}}
+
+-- common
+modkey     = "Mod4"
+altkey     = "Mod1"
+terminal   = "xfce4-terminal" or "gnome-terminal"
+editor     = os.getenv("EDITOR") or "nano" or "vi"
+editor_cmd = terminal .. " -e " .. editor
+homepath   = os.getenv("HOME")
 
 -- {{{ Error handling
 if awesome.startup_errors then
@@ -39,16 +47,15 @@ end
 -- }}}
 
 -- {{{ Autostart applications
-function run_once(cmd)
-  findme = cmd
-  firstspace = cmd:find(" ")
-  if firstspace then
-     findme = cmd:sub(0, firstspace-1)
-  end
-  awful.util.spawn_with_shell("pgrep -u $USER -x " .. findme .. " > /dev/null || (" .. cmd .. ")")
+function run_once(cmd,hazily)
+    if not pname then pname = cmd end
+    cmd=cmd:gsub("^~",homepath)
+    if hazily then
+        awful.util.spawn_with_shell("pgrep -f -u $USER " .. cmd .. " >/dev/null || (" .. cmd .. ")")
+    else
+        awful.util.spawn_with_shell("pgrep -f -u $USER -x " .. cmd .. " >/dev/null || (" .. cmd .. ")")
+    end
 end
-
-run_once("unclutter")
 -- }}}
 
 -- {{{ Variable definitions
@@ -56,21 +63,7 @@ run_once("unclutter")
 os.setlocale(os.getenv("LANG"))
 
 -- beautiful init
-beautiful.init(os.getenv("HOME") .. "/.config/awesome/themes/oauhix/theme.lua")
-
--- common
-modkey     = "Mod4"
-altkey     = "Mod1"
-terminal   = "urxvtc" or "xterm"
-editor     = os.getenv("EDITOR") or "nano" or "vi"
-editor_cmd = terminal .. " -e " .. editor
-
--- user defined
-browser    = "dwb"
-browser2   = "iron"
-gui_editor = "gvim"
-graphics   = "gimp"
-mail       = terminal .. " -e mutt "
+beautiful.init(homepath .. "/.config/awesome/themes/oauhix/theme.lua")
 
 local layouts = {
     awful.layout.suit.floating,
@@ -482,7 +475,8 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, "Shift"   }, "q",      awesome.quit),
 
     -- Dropdown terminal
-    awful.key({ modkey,	          }, "z",      function () drop(terminal) end),
+    --awful.key({ modkey, 	      }, "Escape", function () drop(terminal) end),
+    awful.key({ modkey,	          }, "Escape", function () awful.util.spawn("xfce4-terminal --drop-down") end),
 
     -- Widgets popups
     awful.key({ altkey,           }, "c",      function () lain.widgets.calendar:show(7) end),
@@ -535,12 +529,6 @@ globalkeys = awful.util.table.join(
 
     -- Copy to clipboard
     awful.key({ modkey }, "c", function () os.execute("xsel -p -o | xsel -i -b") end),
-
-    -- User programs
-    awful.key({ modkey }, "q", function () awful.util.spawn(browser) end),
-    awful.key({ modkey }, "i", function () awful.util.spawn(browser2) end),
-    awful.key({ modkey }, "s", function () awful.util.spawn(gui_editor) end),
-    awful.key({ modkey }, "g", function () awful.util.spawn(graphics) end),
 
     -- Prompt
     awful.key({ modkey }, "r", function () mypromptbox[mouse.screen]:run() end),
@@ -614,10 +602,6 @@ clientbuttons = awful.util.table.join(
     awful.button({ }, 1, function (c) client.focus = c; c:raise() end),
     awful.button({ modkey }, 1, awful.mouse.client.move),
     awful.button({ modkey }, 3, awful.mouse.client.resize))
-
--- Set keys
-root.keys(globalkeys)
--- }}}
 
 -- {{{ Rules
 awful.rules.rules = {
@@ -711,3 +695,29 @@ for s = 1, screen.count() do screen[s]:connect_signal("arrange", function ()
 end
 -- }}}
 
+-- {{{ Hotkey for user programs
+globalkeys = awful.util.table.join(globalkeys,
+    awful.key({ modkey }, "F12", function () awful.util.spawn_with_shell("sleep 1 && xset dpms force off") end),
+    awful.key({ modkey }, "s", function () awful.util.spawn("firefox") end),
+    awful.key({ modkey }, "e", function () awful.util.spawn("xfce4-terminal -e vifm") end)
+)
+-- Set keys
+root.keys(globalkeys)
+-- }}}
+
+-- {{{ Autostart setting
+
+-- Restart Xcompmgr which awesome reload
+--awful.util.spawn_with_shell("killall xcompmgr ; xcompmgr -cCfFS")
+
+-- Autostart Applications
+run_once("goldendict")
+run_once("~/.nutstore/bin/nutstore-pydaemon.py", true)
+---}}}
+
+-- Include local file
+local file = io.open(".config/awesome/local.lua")
+--if file ~= nil then file:close() require("local") end
+
+
+-- vim: ft=lua
