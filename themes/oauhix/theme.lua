@@ -5,11 +5,10 @@
                                       
 --]]
 
+local gears = require("gears")
 
 theme                               = {}
-
-theme.confdir                       = os.getenv("HOME") .. "/.config/awesome/themes/multicolor"
-theme.wallpaper                     = theme.confdir .. "/wall.png"
+theme.confdir                       = os.getenv("HOME") .. "/.config/awesome/themes/oauhix"
 
 -- string is composed of "font_name [ font_size]"
 theme.font                          = "sans 8"
@@ -80,6 +79,60 @@ theme.layout_max                    = theme.confdir .. "/icons/max.png"
 theme.layout_fullscreen             = theme.confdir .. "/icons/fullscreen.png"
 theme.layout_magnifier              = theme.confdir .. "/icons/magnifier.png"
 theme.layout_floating               = theme.confdir .. "/icons/floating.png"
+
+-- {{{ autochange wallpaper
+-- set parameters
+wp_path    = os.getenv("HOME") .. "/Pictures/wallpapers/"
+wp_timeout = 300
+
+-- scan directory, and optionally filter outputs
+function scandir(directory, filter)
+    local i, t, popen = 0, {}, io.popen
+    if not filter then
+        filter = function(s) return true end
+    end
+    print(filter)
+    for filename in popen('ls -a "'..directory..'"'):lines() do
+        if filter(filename) then
+            i = i + 1
+            t[i] = filename
+        end
+    end
+    return t
+end
+
+wp_filter = function(s) return string.match(s,"%.png$") or string.match(s,"%.jpg$") end
+wp_files = scandir(wp_path, wp_filter)
+
+wp_index = math.random( 1, #wp_files)
+-- set wallpaper to current index for all screens
+for s = 1, screen.count() do
+    gears.wallpaper.maximized(wp_path .. wp_files[wp_index], s, true)
+end
+ 
+-- setup the timer
+wp_timer = timer { timeout = wp_timeout }
+wp_timer:connect_signal("timeout", function()
+  -- stop the timer (we don't need multiple instances running at the same time)
+  wp_timer:stop()
+  -- get next random index
+  wp_index = math.random( 1, #wp_files)
+ 
+  -- set wallpaper to current index for all screens
+  for s = 1, screen.count() do
+    print ("wp_index:", wp_index, "/", #wp_files)
+    print ("wp_files[wp_index]:", wp_files[wp_index])
+    print(wp_path .. wp_files[wp_index])
+    gears.wallpaper.maximized(wp_path .. wp_files[wp_index], s, true)
+  end
+  --restart the timer
+  wp_timer.timeout = wp_timeout
+  wp_timer:start()
+end)
+ 
+-- initial start when rc.lua is first run
+wp_timer:start()
+---}}}
 
 
 return theme

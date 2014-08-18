@@ -24,6 +24,7 @@ terminal   = "xfce4-terminal" or "gnome-terminal"
 editor     = os.getenv("EDITOR") or "nano" or "vi"
 editor_cmd = terminal .. " -e " .. editor
 homepath   = os.getenv("HOME")
+ncol       = 1
 
 -- {{{ Error handling
 if awesome.startup_errors then
@@ -66,27 +67,27 @@ os.setlocale(os.getenv("LANG"))
 beautiful.init(homepath .. "/.config/awesome/themes/oauhix/theme.lua")
 
 local layouts = {
-    awful.layout.suit.floating,
     awful.layout.suit.tile,
     awful.layout.suit.tile.left,
-    awful.layout.suit.tile.bottom,
-    awful.layout.suit.tile.top,
-    awful.layout.suit.fair,
-    awful.layout.suit.fair.horizontal,
-    awful.layout.suit.spiral,
-    awful.layout.suit.spiral.dwindle,
     awful.layout.suit.max,
+    --awful.layout.suit.tile.bottom,
+    --awful.layout.suit.tile.top,
+    --awful.layout.suit.floating,
+    --awful.layout.suit.fair,
+    --awful.layout.suit.fair.horizontal,
+    --awful.layout.suit.spiral,
+    --awful.layout.suit.spiral.dwindle,
 }
 -- }}}
 
 -- {{{ Tags
 tags = {
-   names = { "web", "term", "docs", "media", "files", "other" },
-   layout = { layouts[1], layouts[3], layouts[4], layouts[1], layouts[7], layouts[1] }
+   names  = { 1,2,3,4,5,6,7,8,9 },
+   layout = { layouts[1], layouts[3] }
 }
 for s = 1, screen.count() do
 -- Each screen has its own tag table.
-   tags[s] = awful.tag(tags.names, s, tags.layout)
+   tags[s] = awful.tag(tags.names, s, tags.layout[1])
 end
 -- }}}
 
@@ -107,7 +108,8 @@ markup      = lain.util.markup
 
 -- Textclock
 clockicon = wibox.widget.imagebox(beautiful.widget_clock)
-mytextclock = awful.widget.textclock(markup("#7788af", "%A %d %B ") .. markup("#343639", ">") .. markup("#de5e1e", " %H:%M "))
+--mytextclock = awful.widget.textclock(markup("#7788af", "%A %d %B ") .. markup("#343639", ">") .. markup("#de5e1e", " %H:%M "))
+mytextclock = awful.widget.textclock(markup("#7788af", "%m-%d '%w ") .. markup("#de5e1e", "%H:%M "))
 
 -- Calendar
 lain.widgets.calendar:attach(mytextclock, { font_size = 10 })
@@ -344,36 +346,40 @@ for s = 1, screen.count() do
     right_layout:add(yawn.widget)
     right_layout:add(tempicon)
     right_layout:add(tempwidget)
-    right_layout:add(baticon)
-    right_layout:add(batwidget)
+    if bat_now.perc ~= "AC " then
+        right_layout:add(baticon)
+        right_layout:add(batwidget)
+    end
     right_layout:add(clockicon)
     right_layout:add(mytextclock)
+
+    right_layout:add(mylayoutbox[s])
 
     -- Now bring it all together (with the tasklist in the middle)
     local layout = wibox.layout.align.horizontal()
     layout:set_left(left_layout)
-    --layout:set_middle(mytasklist[s])
+    layout:set_middle(mytasklist[s])
     layout:set_right(right_layout)
     
     mywibox[s]:set_widget(layout)
 
     -- Create the bottom wibox
-    mybottomwibox[s] = awful.wibox({ position = "bottom", screen = s, border_width = 0, height = 20 })
+    --mybottomwibox[s] = awful.wibox({ position = "bottom", screen = s, border_width = 0, height = 20 })
     --mybottomwibox[s].visible = false
             
     -- Widgets that are aligned to the bottom left
-    bottom_left_layout = wibox.layout.fixed.horizontal()
+    --bottom_left_layout = wibox.layout.fixed.horizontal()
                         
     -- Widgets that are aligned to the bottom right
-    bottom_right_layout = wibox.layout.fixed.horizontal()
-    bottom_right_layout:add(mylayoutbox[s])
+    --bottom_right_layout = wibox.layout.fixed.horizontal()
+    --bottom_right_layout:add(mylayoutbox[s])
                                             
     -- Now bring it all together (with the tasklist in the middle)
-    bottom_layout = wibox.layout.align.horizontal()
-    bottom_layout:set_left(bottom_left_layout)
-    bottom_layout:set_middle(mytasklist[s])
-    bottom_layout:set_right(bottom_right_layout)
-    mybottomwibox[s]:set_widget(bottom_layout)
+    --bottom_layout = wibox.layout.align.horizontal()
+    --bottom_layout:set_left(bottom_left_layout)
+    --bottom_layout:set_middle(mytasklist[s])
+    --bottom_layout:set_right(bottom_right_layout)
+    --mybottomwibox[s]:set_widget(bottom_layout)
 end
 -- }}}
 
@@ -447,10 +453,40 @@ globalkeys = awful.util.table.join(
     end),
 
     -- Layout manipulation
-    awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.byidx(  1)    end),
-    awful.key({ modkey, "Shift"   }, "k", function () awful.client.swap.byidx( -1)    end),
-    awful.key({ modkey, "Control" }, "j", function () awful.screen.focus_relative( 1) end),
-    awful.key({ modkey, "Control" }, "k", function () awful.screen.focus_relative(-1) end),
+    awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.bydirection("down") end),
+    awful.key({ modkey, "Shift"   }, "k", function () awful.client.swap.bydirection("up")   end),
+    awful.key({ modkey, "Shift"   }, "l", function () awful.client.swap.bydirection("right") end),
+    awful.key({ modkey, "Shift"   }, "h", function () awful.client.swap.bydirection("left")  end),
+
+    -- Increase(+1/-1) the number of master windows.
+    awful.key({ modkey, "Shift"   }, "Up",   function () awful.tag.incnmaster( 1)       end),
+    awful.key({ modkey, "Shift"   }, "Down", function () awful.tag.incnmaster(-1)       end),
+
+    -- Set master width factor
+    awful.key({ altkey, "Shift"   }, "l",      function () awful.tag.incmwfact( 0.05)     end),
+    awful.key({ altkey, "Shift"   }, "h",      function () awful.tag.incmwfact(-0.05)     end),
+
+    --awful.key({ modkey, "Control" }, "j", function () awful.screen.focus_relative( 1) end),
+    --awful.key({ modkey, "Control" }, "k", function () awful.screen.focus_relative(-1) end),
+    awful.key({ modkey, "Control" }, "Down",      
+        function () 
+            if ncol ~= 1 then 
+                ncol = ncol - 1  
+                awful.tag.setncol(ncol)          
+            end
+        end),
+    awful.key({ modkey, "Control" }, "Up",
+        function () 
+            print(ncol)
+            if ncol >= 5 then 
+                ncol = 1  
+                awful.tag.setncol(ncol)          
+            else
+                ncol = ncol + 1
+                awful.tag.setncol(ncol)          
+            end
+        end),
+
     awful.key({ modkey,           }, "u", awful.client.urgent.jumpto),
     awful.key({ modkey,           }, "Tab",
         function ()
@@ -459,12 +495,7 @@ globalkeys = awful.util.table.join(
                 client.focus:raise()
             end
         end),
-    awful.key({ altkey, "Shift"   }, "l",      function () awful.tag.incmwfact( 0.05)     end),
-    awful.key({ altkey, "Shift"   }, "h",      function () awful.tag.incmwfact(-0.05)     end),
-    awful.key({ modkey, "Shift"   }, "l",      function () awful.tag.incnmaster(-1)       end),
-    awful.key({ modkey, "Shift"   }, "h",      function () awful.tag.incnmaster( 1)       end),
-    awful.key({ modkey, "Control" }, "l",      function () awful.tag.incncol(-1)          end),
-    awful.key({ modkey, "Control" }, "h",      function () awful.tag.incncol( 1)          end),
+
     awful.key({ modkey,           }, "space",  function () awful.layout.inc(layouts,  1)  end),
     awful.key({ modkey, "Shift"   }, "space",  function () awful.layout.inc(layouts, -1)  end),
     awful.key({ modkey, "Control" }, "n",      awful.client.restore),
@@ -475,8 +506,8 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, "Shift"   }, "q",      awesome.quit),
 
     -- Dropdown terminal
-    --awful.key({ modkey, 	      }, "Escape", function () drop(terminal) end),
-    awful.key({ modkey,	          }, "Escape", function () awful.util.spawn("xfce4-terminal --drop-down") end),
+    --awful.key({ "Control", 	  }, "Escape", function () drop(terminal) end),
+    awful.key({ "Control",	      }, "Escape", function () awful.util.spawn("xfce4-terminal --drop-down") end),
 
     -- Widgets popups
     awful.key({ altkey,           }, "c",      function () lain.widgets.calendar:show(7) end),
@@ -486,12 +517,12 @@ globalkeys = awful.util.table.join(
     -- ALSA volume control
     awful.key({ altkey }, "Up",
         function ()
-            awful.util.spawn("amixer -q set Master 1%+")
+            awful.util.spawn("amixer -q set Master 5%+")
             volumewidget.update()
         end),
     awful.key({ altkey }, "Down",
         function ()
-            awful.util.spawn("amixer -q set Master 1%-")
+            awful.util.spawn("amixer -q set Master 5%-")
             volumewidget.update()
         end),
     awful.key({ altkey }, "m",
@@ -613,27 +644,26 @@ awful.rules.rules = {
                      keys = clientkeys,
                      buttons = clientbuttons,
 	                   size_hints_honor = false } },
-    { rule = { class = "URxvt" },
-          properties = { opacity = 0.99 } },
+
+    -- Start windows as slave
+    { rule = { }, properties = { }, callback = awful.client.setslave },
 
     { rule = { class = "MPlayer" },
-          properties = { floating = true } },
-
-    { rule = { class = "Dwb" },
-          properties = { tag = tags[1][1] } },
-
-    { rule = { class = "Iron" },
-          properties = { tag = tags[1][1] } },
-
-    { rule = { instance = "plugin-container" },
-          properties = { tag = tags[1][1] } },
-
-    { rule = { class = "Gimp" },
-          properties = { tag = tags[1][4] } },
-
-    { rule = { class = "Gimp", role = "gimp-image-window" },
-          properties = { maximized_horizontal = true,
-                         maximized_vertical = true } },
+      properties = { floating = true } },
+    { rule = { class = "Smplayer" },
+      properties = { floating = true } },
+    { rule = { class = "Xfce4-terminal", role = "xfce4-terminal-dropdown" },
+      properties = { floating = true } },
+    { rule = { class = "Firefox", instance = "Firebug" },
+      properties = { floating = true } },
+    { rule = { class = "Goldendict" },
+      properties = { floating = true } },
+    { rule = { class = "pinentry" },
+      properties = { floating = true } },
+    { rule = { class = "gimp" },
+      properties = { floating = true } },
+    { rule = { class = "gimp", role = "gimp-image-window" },
+      properties = { maximized_horizontal = true, maximized_vertical = true } },
 }
 -- }}}
 
@@ -717,7 +747,7 @@ run_once("~/.nutstore/bin/nutstore-pydaemon.py", true)
 
 -- Include local file
 local file = io.open(".config/awesome/local.lua")
---if file ~= nil then file:close() require("local") end
+if file ~= nil then file:close() require("local") end
 
 
 -- vim: ft=lua
