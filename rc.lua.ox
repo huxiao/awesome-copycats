@@ -477,7 +477,6 @@ globalkeys = awful.util.table.join(
         end),
     awful.key({ modkey, "Control" }, "Up",
         function () 
-            print(ncol)
             if ncol >= 5 then 
                 ncol = 1  
                 awful.tag.setncol(ncol)          
