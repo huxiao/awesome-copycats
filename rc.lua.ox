@@ -15,6 +15,7 @@ local beautiful = require("beautiful")
 local naughty   = require("naughty")
 --local drop      = require("scratchdrop")
 local lain      = require("lain")
+local menubar   = require("menubar")
 -- }}}
 
 -- common
@@ -503,6 +504,9 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey,           }, "Return", function () awful.util.spawn(terminal) end),
     awful.key({ modkey, "Control" }, "r",      awesome.restart),
     awful.key({ modkey, "Shift"   }, "q",      awesome.quit),
+
+    -- Menubar
+    awful.key({ modkey }, "p", function() menubar.show() end),
 
     -- Dropdown terminal
     --awful.key({ "Control", 	  }, "Escape", function () drop(terminal) end),
