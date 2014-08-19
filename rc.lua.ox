@@ -50,8 +50,6 @@ end
 
 -- {{{ Autostart applications
 function run_once(cmd,hazily)
-    if not pname then pname = cmd end
-    cmd=cmd:gsub("^~",homepath)
     if hazily then
         awful.util.spawn_with_shell("pgrep -f -u $USER " .. cmd .. " >/dev/null || (" .. cmd .. ")")
     else
