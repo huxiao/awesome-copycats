@@ -85,8 +85,7 @@ Using git you can have the full master branch: ::
     git clone https://github.com/copycat-killer/awesome-copycats.git
     mv awesome-copycats/* ~/.config/awesome; rmdir awesome-copycats
     cd ~/.config/awesome
-    git submodule init
-    git submodule update
+    git submodule update --init
 
 This may take some time.
 
@@ -107,7 +106,7 @@ Then, eventually customize your ``rc.lua``, and restart Awesome (``Mod4 + ctrl +
 Notes
 =====
 
-Be sure to have the latest versions of Lua, Lua-lgi, and Awesome.
+Be sure to have the latest **stable** versions of Lua, Lua-lgi, and Awesome.
 
 Complements are provided by lain_: be sure to meet its dependencies_.
 
