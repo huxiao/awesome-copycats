@@ -108,24 +108,16 @@ markup      = lain.util.markup
 -- Textclock
 clockicon = wibox.widget.imagebox(beautiful.widget_clock)
 --mytextclock = awful.widget.textclock(markup("#7788af", "%A %d %B ") .. markup("#343639", ">") .. markup("#de5e1e", " %H:%M "))
-mytextclock = awful.widget.textclock(markup("#7788af", "%m-%d '%w ") .. markup("#de5e1e", "%H:%M "))
+mytextclock = awful.widget.textclock(markup("#7788af", "<b>%m-%d '%w </b>") .. markup("#7788af", "<b>%H:%M </b>"))
 
 -- Calendar
-lain.widgets.calendar:attach(mytextclock, { font_size = 10 })
-
--- Weather
-weathericon = wibox.widget.imagebox(beautiful.widget_weather)
-yawn = lain.widgets.yawn(123456, {
-    settings = function()
-        widget:set_markup(markup("#eca4c4", forecast:lower() .. " @ " .. units .. "°C "))
-    end
-})
+lain.widgets.calendar:attach(mytextclock, { font = "monospace", font_size = 10 })
 
 -- / fs
-fsicon = wibox.widget.imagebox(beautiful.widget_fs)
+--fsicon = wibox.widget.imagebox(beautiful.widget_fs)
 fswidget = lain.widgets.fs({
-    settings  = function()
-        widget:set_markup(markup("#80d9d8", fs_now.used .. "% "))
+    settings = function()
+        fs_notification_preset = { font = "monospace 8" }
     end
 })
 
@@ -149,23 +141,6 @@ mailwidget = lain.widgets.imap({
     end
 })
 ]]
-
--- CPU
-cpuicon = wibox.widget.imagebox()
-cpuicon:set_image(beautiful.widget_cpu)
-cpuwidget = lain.widgets.cpu({
-    settings = function()
-        widget:set_markup(markup("#e33a6e", cpu_now.usage .. "% "))
-    end
-})
-
--- Coretemp
-tempicon = wibox.widget.imagebox(beautiful.widget_temp)
-tempwidget = lain.widgets.temp({
-    settings = function()
-        widget:set_markup(markup("#f1af5f", coretemp_now .. "°C "))
-    end
-})
 
 -- Battery
 baticon = wibox.widget.imagebox(beautiful.widget_batt)
@@ -201,14 +176,6 @@ netupinfo = lain.widgets.net({
     settings = function()
         widget:set_markup(markup("#e54c62", net_now.sent .. " "))
         netdowninfo:set_markup(markup("#87af5f", net_now.received .. " "))
-    end
-})
-
--- MEM
-memicon = wibox.widget.imagebox(beautiful.widget_mem)
-memwidget = lain.widgets.mem({
-    settings = function()
-        widget:set_markup(markup("#e0da37", mem_now.used .. "M "))
     end
 })
 
@@ -335,16 +302,10 @@ for s = 1, screen.count() do
     right_layout:add(netupinfo)
     right_layout:add(volicon)
     right_layout:add(volumewidget)
-    right_layout:add(memicon)
-    right_layout:add(memwidget)
-    right_layout:add(cpuicon)
-    right_layout:add(cpuwidget)
-    right_layout:add(fsicon)
+    --right_layout:add(fsicon)
     right_layout:add(fswidget)
-    right_layout:add(weathericon)
-    right_layout:add(yawn.widget)
-    right_layout:add(tempicon)
-    right_layout:add(tempwidget)
+    --right_layout:add(weathericon)
+    --right_layout:add(yawn.widget)
     if bat_now.perc ~= "AC " then
         right_layout:add(baticon)
         right_layout:add(batwidget)
@@ -513,7 +474,6 @@ globalkeys = awful.util.table.join(
     -- Widgets popups
     awful.key({ altkey,           }, "c",      function () lain.widgets.calendar:show(7) end),
     awful.key({ altkey,           }, "h",      function () fswidget.show(7) end),
-    awful.key({ altkey,           }, "w",      function () yawn.show(7) end),
 
     -- ALSA volume control
     awful.key({ altkey }, "Up",
