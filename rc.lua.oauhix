@@ -21,9 +21,8 @@ local menubar   = require("menubar")
 -- common
 modkey     = "Mod4"
 altkey     = "Mod1"
-terminal   = "xfce4-terminal" or "gnome-terminal"
-editor     = os.getenv("EDITOR") or "nano" or "vi"
-editor_cmd = terminal .. " -e " .. editor
+terminal   = "xfce4-terminal"
+editor_cmd = terminal .. " -e vim"
 homepath   = os.getenv("HOME")
 ncol       = 1
 
@@ -460,7 +459,7 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, "Control" }, "n",      awful.client.restore),
 
     -- Standard program
-    awful.key({ modkey,           }, "Return", function () awful.util.spawn(terminal) end),
+    awful.key({ modkey,           }, "Return", function () awful.util.spawn("xfce4-terminal") end),
     awful.key({ modkey, "Control" }, "r",      awesome.restart),
     awful.key({ modkey, "Shift"   }, "q",      awesome.quit),
 
@@ -468,7 +467,7 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey }, "p", function() menubar.show() end),
 
     -- Dropdown terminal
-    --awful.key({ "Control", 	  }, "Escape", function () drop(terminal) end),
+    --awful.key({ "Control", 	  }, "Escape", function () drop("xfce4-terminal") end),
     awful.key({ "Control",	      }, "Escape", function () awful.util.spawn("xfce4-terminal --drop-down") end),
 
     -- Widgets popups
@@ -531,6 +530,9 @@ globalkeys = awful.util.table.join(
                   awful.util.eval, nil,
                   awful.util.getdir("cache") .. "/history_eval")
               end)
+
+    -- System admin
+    --awful.key({ "Control", altkey }, "BackSpace", function () awful.util.spawn_with_shell("killall xfce4-terminal && systemctl poweroff") end)
 )
 
 clientkeys = awful.util.table.join(
