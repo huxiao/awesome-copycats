@@ -529,10 +529,10 @@ globalkeys = awful.util.table.join(
                   mypromptbox[mouse.screen].widget,
                   awful.util.eval, nil,
                   awful.util.getdir("cache") .. "/history_eval")
-              end)
+              end),
 
     -- System admin
-    --awful.key({ "Control", altkey }, "BackSpace", function () awful.util.spawn_with_shell("killall xfce4-terminal && systemctl poweroff") end)
+    awful.key({ "Control", altkey }, "BackSpace", function () awful.util.spawn_with_shell("killall xfce4-terminal ; systemctl poweroff") end)
 )
 
 clientkeys = awful.util.table.join(
