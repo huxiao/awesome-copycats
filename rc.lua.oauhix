@@ -611,6 +611,10 @@ awful.rules.rules = {
     -- Start windows as slave
     { rule = { }, properties = { }, callback = awful.client.setslave },
 
+    { rule = { class = "Galculator" },
+      properties = { floating = true } },
+    { rule = { class = "KeePass2" },
+      properties = { floating = true } },
     { rule = { class = "MPlayer" },
       properties = { floating = true } },
     { rule = { class = "Smplayer" },
@@ -694,7 +698,10 @@ end
 globalkeys = awful.util.table.join(globalkeys,
     awful.key({ modkey }, "F12", function () awful.util.spawn_with_shell("sleep 1 && xset dpms force off") end),
     awful.key({ modkey }, "s", function () awful.util.spawn("firefox") end),
-    awful.key({ modkey }, "e", function () awful.util.spawn("xfce4-terminal -e vifm") end)
+    awful.key({ modkey }, "e", function () awful.util.spawn("xfce4-terminal -e vifm") end),
+    -- awful.key({ modkey, "Shift"   }, "0",   function () awful.util.spawn_with_shell("mono /usr/bin/keepass --autotype") end)
+    awful.key({ altkey, "Control" }, "a",   function () awful.util.spawn_with_shell("keepass --auto-type") end),
+    awful.key({ altkey, "Control" }, "k",   function () awful.util.spawn_with_shell("keepass") end)
 )
 -- Set keys
 root.keys(globalkeys)
