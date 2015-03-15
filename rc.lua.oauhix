@@ -633,6 +633,8 @@ awful.rules.rules = {
       properties = { floating = true } },
     { rule = { class = "gimp", role = "gimp-image-window" },
       properties = { maximized_horizontal = true, maximized_vertical = true } },
+    { rule = { class = "Wpa_gui" },
+      properties = { floating = true } },
 }
 -- }}}
 
